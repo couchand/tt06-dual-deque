@@ -1,14 +1,14 @@
 # Tiny Tapeout project information
 project:
-  title:        "Simple RAM (512 bits)"      # Project title
+  title:        "Simple RAM (256 bits)"      # Project title
   author:       "Uri Shaked"      # Your name
   discord:      "urish"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "64 byte RAM built out of DFFs"      # One line description of what your project does
+  description:  "32 byte RAM built out of DFFs"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
   top_module:  "tt_um_urish_256_bits_dff_mem"
@@ -25,7 +25,7 @@ pinout:
   ui[2]: "addr[2]"
   ui[3]: "addr[3]"
   ui[4]: "addr[4]"
-  ui[5]: "addr[5]"
+  ui[5]: ""
   ui[6]: ""
   ui[7]: "wr_en"
 
