@@ -1,7 +1,7 @@
 `default_nettype none
 
 module tt_um_urish_256_bits_dff_mem #(
-    parameter RAM_BYTES = 32
+    parameter RAM_BYTES = 64
 ) (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output reg  [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
