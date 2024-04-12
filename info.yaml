@@ -22,24 +22,24 @@ project:
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: "Data In"
-  ui[1]: "Data In"
-  ui[2]: "Data In"
-  ui[3]: "Data In"
-  ui[4]: "Data In"
-  ui[5]: "Data In"
-  ui[6]: "Data In"
-  ui[7]: "Data In"
+  ui[0]: "Data In 0"
+  ui[1]: "Data In 1"
+  ui[2]: "Data In 2"
+  ui[3]: "Data In 3"
+  ui[4]: "Data In 4"
+  ui[5]: "Data In 5"
+  ui[6]: "Data In 6"
+  ui[7]: "Data In 7"
 
   # Outputs
-  uo[0]: "Data Out"
-  uo[1]: "Data Out"
-  uo[2]: "Data Out"
-  uo[3]: "Data Out"
-  uo[4]: "Data Out"
-  uo[5]: "Data Out"
-  uo[6]: "Data Out"
-  uo[7]: "Data Out"
+  uo[0]: "Data Out 0"
+  uo[1]: "Data Out 1"
+  uo[2]: "Data Out 2"
+  uo[3]: "Data Out 3"
+  uo[4]: "Data Out 4"
+  uo[5]: "Data Out 5"
+  uo[6]: "Data Out 6"
+  uo[7]: "Data Out 7"
 
   # Bidirectional pins
   uio[0]: "Stack Select"

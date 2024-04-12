@@ -1,8 +1,10 @@
+Two independent stacks in one tiny footprint.
+
 ## How it works
 
 Each stack is an array of flip flops with a pointer to the top.  The empty and full
-status flags are directly output, and push, pop, and the data bus lines are multiplexed
-between the two stacks with the stack select line.
+status flags for each are directly available on pins.  The push and pop inputs as
+well as data bus lines are multiplexed using the stack select line.
 
 ## How to test
 
@@ -22,3 +24,7 @@ To read the top of stack:
 - Select which stack to read with `stack_select`
 - Wait one cycle
 - Read top of stack from `data_out`
+
+## External hardware
+
+You would probably want to connect this to other devices that would find it useful.
