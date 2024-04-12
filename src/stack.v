@@ -24,20 +24,23 @@ module stack #(
 
   reg [addr_bits-1:0] addr_wr;
   reg [7:0] STACK[WORDS - 1:0];
+  reg ss;
 
   wire [addr_bits-1:0] addr_rd = addr_wr - 1;
 
   assign full = addr_rd == WORDS - 1 & ~empty;
-  assign data_out = empty | stack_select != ADDR ? 0 : STACK[addr_rd];
+  assign data_out = empty | ~ss ? 0 : STACK[addr_rd];
 
   always @(posedge clk) begin
     if (!rst_n) begin
       empty <= 1;
       addr_wr <= 0;
+      ss <= 0;
       for (int i = 0; i < WORDS; i++) begin
         STACK[i] <= 8'b0;
       end
     end else if (stack_select == ADDR) begin
+      ss <= 1;
       if (push & ~full) begin
         STACK[addr_wr] <= data_in;
         addr_wr <= addr_wr + 1;
@@ -48,6 +51,8 @@ module stack #(
           empty <= 1;
         end
       end
+    end else begin
+      ss <= 0;
     end
   end
 
