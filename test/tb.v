@@ -22,8 +22,7 @@ module tb ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
-  // Replace tt_um_example with your module name:
-  tt_um_urish_256_bits_dff_mem user_project (
+  tt_um_couchand_dual_stack user_project (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST

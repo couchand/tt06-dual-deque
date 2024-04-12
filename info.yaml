@@ -1,53 +1,55 @@
 # Tiny Tapeout project information
 project:
-  title:        "Simple RAM (512 bits)"      # Project title
-  author:       "Uri Shaked"      # Your name
-  discord:      "urish"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "64 byte RAM built out of DFFs"      # One line description of what your project does
+  title:        "Dual Stack"      # Project title
+  author:       "Andrew Dona-Couch"      # Your name
+  discord:      "couchand_75981"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
+  description:  "Dual 1-byte word stacks"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_urish_256_bits_dff_mem"
+  top_module:  "tt_um_couchand_dual_stack"
 
   # List your project's source files here. Source files must be in ./src and you must list each source file separately, one per line:
   source_files:
-    - "dff_memory.v"
+    - "project.v"
+    - "dual_stack.v"
+    - "stack.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: "addr[0]"
-  ui[1]: "addr[1]"
-  ui[2]: "addr[2]"
-  ui[3]: "addr[3]"
-  ui[4]: "addr[4]"
-  ui[5]: "addr[5]"
-  ui[6]: ""
-  ui[7]: "wr_en"
+  ui[0]: "Data In"
+  ui[1]: "Data In"
+  ui[2]: "Data In"
+  ui[3]: "Data In"
+  ui[4]: "Data In"
+  ui[5]: "Data In"
+  ui[6]: "Data In"
+  ui[7]: "Data In"
 
   # Outputs
-  uo[0]: "out[0]"
-  uo[1]: "out[1]"
-  uo[2]: "out[2]"
-  uo[3]: "out[3]"
-  uo[4]: "out[4]"
-  uo[5]: "out[5]"
-  uo[6]: "out[6]"
-  uo[7]: "out[7]"
+  uo[0]: "Data Out"
+  uo[1]: "Data Out"
+  uo[2]: "Data Out"
+  uo[3]: "Data Out"
+  uo[4]: "Data Out"
+  uo[5]: "Data Out"
+  uo[6]: "Data Out"
+  uo[7]: "Data Out"
 
   # Bidirectional pins
-  uio[0]: "in[0]"
-  uio[1]: "in[1]"
-  uio[2]: "in[2]"
-  uio[3]: "in[3]"
-  uio[4]: "in[4]"
-  uio[5]: "in[5]"
-  uio[6]: "in[6]"
-  uio[7]: "in[7]"
+  uio[0]: "Stack Select"
+  uio[1]: "Push"
+  uio[2]: "Pop"
+  uio[3]: ""
+  uio[4]: "Stack 0 Empty"
+  uio[5]: "Stack 0 Full"
+  uio[6]: "Stack 1 Empty"
+  uio[7]: "Stack 1 Full"
 
 # Do not change!
 yaml_version: 6

@@ -5,14 +5,10 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
-# Define the write enable bit
-WE = 1 << 7
-
 @cocotb.test()
-async def test_adder(dut):
+async def test_stacks(dut):
   dut._log.info("Start")
-  
-  # Our example module doesn't use clock and reset, but we show how to use them here anyway.
+
   clock = Clock(dut.clk, 10, units="us")
   cocotb.start_soon(clock.start())
 
@@ -25,78 +21,132 @@ async def test_adder(dut):
   await ClockCycles(dut.clk, 10)
   dut.rst_n.value = 1
 
-  # All the bidirectional ports are used for the data_in signal, so they should be inputs
-  assert int(dut.uio_oe.value) == 0
+  # Initialization
+  dut._log.info("Initialization")
 
-  dut._log.info("write 4 bytes to addresses 8, 9, 10, 11")
-  dut.ui_in.value = WE | 8
-  dut.uio_in.value = 0x55
-  await ClockCycles(dut.clk, 1)
+  # Both empty at start
+  assert dut.uio_out.value & 0xF0 == 0x50
 
-  dut.ui_in.value = WE | 9 
-  dut.uio_in.value = 0x66
-  await ClockCycles(dut.clk, 1)
+  # Data lines are zero when empty
 
-  dut.ui_in.value = WE | 10
-  dut.uio_in.value = 0x77
-  await ClockCycles(dut.clk, 1)
-
-  dut.ui_in.value = WE | 11
-  dut.uio_in.value = 0x88
-  await ClockCycles(dut.clk, 1)
-
-  dut._log.info("read back the bytes and verify they are correct")
+  # Stack 0
   dut.uio_in.value = 0
-  dut.ui_in.value = 8
-  await ClockCycles(dut.clk, 2)
-  assert int(dut.uo_out.value) == 0x55
-
-  dut.ui_in.value = 9
-  await ClockCycles(dut.clk, 2)
-  assert int(dut.uo_out.value) == 0x66
-
-  dut.ui_in.value = 10
-  await ClockCycles(dut.clk, 2)
-  assert int(dut.uo_out.value) == 0x77
-
-  dut.ui_in.value = 11
-  await ClockCycles(dut.clk, 2)
-  assert int(dut.uo_out.value) == 0x88
-
-  dut._log.info("write a byte at address 12")
-  dut.ui_in.value = WE | 12
-  dut.uio_in.value = 0x99
   await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0
 
-  dut._log.info("overwrite the byte at address 10")
-  dut.ui_in.value = WE | 10
-  dut.uio_in.value = 0xaa
+  # Stack 1
+  dut.uio_in.value = 1
   await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0
 
-  dut._log.info("read back the bytes and verify they are correct")
+
+  # Push
+  dut._log.info("Push")
+
+  ## Stack 0
+  dut.ui_in.value = 0x42
+  dut.uio_in.value = 2
+  await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 0
-  dut.ui_in.value = 12
-  await ClockCycles(dut.clk, 2)
-  assert int(dut.uo_out.value) == 0x99
+  await ClockCycles(dut.clk, 1)
 
-  dut.ui_in.value = 10
-  await ClockCycles(dut.clk, 2)
-  assert int(dut.uo_out.value) == 0xaa
+  assert dut.uo_out.value == 0x42
 
-  dut.ui_in.value = 8
-  await ClockCycles(dut.clk, 2)
-  assert int(dut.uo_out.value) == 0x55
+  # Only stack 1 empty now
+  assert dut.uio_out.value & 0xF0 == 0x40
 
-  # Reset again
-  dut._log.info("Reset")
-  dut.rst_n.value = 0
-  await ClockCycles(dut.clk, 10)
-  dut.rst_n.value = 1
-
-  # Ensure that the memory is cleared
-  for i in range(32):
+  for i in range(1, 15):
     dut.ui_in.value = i
-    await ClockCycles(dut.clk, 2)
-    assert int(dut.uo_out.value) == 0
+    dut.uio_in.value = 2
+    await ClockCycles(dut.clk, 1)
+    dut.uio_in.value = 0
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value == i
+    assert dut.uio_out.value & 0xF0 == 0x40
 
-  dut._log.info("all good!")
+  dut.ui_in.value = 0x9F
+  dut.uio_in.value = 2
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0x9F
+
+  # Now stack 0 full
+  assert dut.uio_out.value & 0xF0 == 0x60
+
+  ## Stack 1
+  dut.ui_in.value = 0x42
+  dut.uio_in.value = 3
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 1
+  await ClockCycles(dut.clk, 1)
+
+  assert dut.uo_out.value == 0x42
+
+  # Stack 1 no longer empty
+  assert dut.uio_out.value & 0xF0 == 0x20
+
+  for i in range(1, 15):
+    dut.ui_in.value = i
+    dut.uio_in.value = 3
+    await ClockCycles(dut.clk, 1)
+    dut.uio_in.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value == i
+    assert dut.uio_out.value & 0xF0 == 0x20
+
+  dut.ui_in.value = 0x9F
+  dut.uio_in.value = 3
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 1
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0x9F
+
+  # Now stack 1 full, too
+  assert dut.uio_out.value & 0xF0 == 0xA0
+
+  # Pop
+  dut._log.info("Pop")
+
+  dut.uio_in.value = 4
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 5
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+
+  assert dut.uio_out.value & 0xF0 == 0x00
+
+  for i in range(14, 0, -1):
+    dut.uio_in.value = 4
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value == i
+    assert dut.uio_out.value & 0xF0 == 0x00
+
+    dut.uio_in.value = 5
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value == i
+    assert dut.uio_out.value & 0xF0 == 0x00
+
+    dut.uio_in.value = 0
+    await ClockCycles(dut.clk, 1)
+
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0x42
+  dut.uio_in.value = 1
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0x42
+
+  dut.uio_in.value = 4
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 5
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+
+  # Both empty again
+  assert dut.uio_out.value & 0xF0 == 0x50
+
+  await ClockCycles(dut.clk, 10)
+  dut._log.info("Tests pass")
