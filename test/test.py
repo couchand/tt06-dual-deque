@@ -5,6 +5,8 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
+import random
+
 @cocotb.test()
 async def test_stacks(dut):
   dut._log.info("Start")
@@ -147,6 +149,114 @@ async def test_stacks(dut):
 
   # Both empty again
   assert dut.uio_out.value & 0xF0 == 0x50
+
+  await ClockCycles(dut.clk, 10)
+  dut._log.info("Tests pass")
+
+@cocotb.test()
+async def test_fuzz(dut):
+  dut._log.info("Start")
+
+  clock = Clock(dut.clk, 10, units="us")
+  cocotb.start_soon(clock.start())
+
+  # Reset
+  dut._log.info("Reset")
+  dut.ena.value = 1
+  dut.ui_in.value = 0
+  dut.uio_in.value = 0
+  dut.rst_n.value = 0
+  await ClockCycles(dut.clk, 10)
+  dut.rst_n.value = 1
+  await ClockCycles(dut.clk, 10)
+
+  ss = 0
+  s0 = []
+  s1 = []
+
+  for step in range(0, 4096):
+    if len(s0) == 0:
+      assert dut.uio_out.value & 0x30 == 0x10
+    elif len(s0) == 16:
+      assert dut.uio_out.value & 0x30 == 0x20
+    else:
+      assert dut.uio_out.value & 0x30 == 0x00
+
+    if ss == 0:
+      if len(s0) == 0:
+        assert dut.uo_out.value == 0
+      else:
+        assert dut.uo_out.value == s0[len(s0) - 1]
+
+    if len(s1) == 0:
+      assert dut.uio_out.value & 0xC0 == 0x40
+    elif len(s1) == 16:
+      assert dut.uio_out.value & 0xC0 == 0x80
+    else:
+      assert dut.uio_out.value & 0xC0 == 0x00
+
+    if ss == 1:
+      if len(s1) == 0:
+        assert dut.uo_out.value == 0
+      else:
+        assert dut.uo_out.value == s1[len(s1) - 1]
+
+    options = [
+      'nop',
+      'push0',
+      'push1',
+      'pop0',
+      'pop1',
+      'toggle',
+    ]
+    choice = random.choice(options)
+
+    if choice == 'push0':
+      nextval = random.randrange(0, 256)
+
+      if len(s0) < 16:
+        s0.append(nextval)
+
+      dut.ui_in.value = nextval
+      dut.uio_in.value = 2
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'push1':
+      nextval = random.randrange(0, 256)
+
+      if len(s1) < 16:
+        s1.append(nextval)
+
+      dut.ui_in.value = nextval
+      dut.uio_in.value = 3
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'pop0':
+      if len(s0) > 0:
+        s0.pop()
+
+      dut.uio_in.value = 4
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'pop1':
+      if len(s1) > 0:
+        s1.pop()
+
+      dut.uio_in.value = 5
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'toggle':
+      ss = 1 - ss
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
 
   await ClockCycles(dut.clk, 10)
   dut._log.info("Tests pass")
