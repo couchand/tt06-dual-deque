@@ -24,7 +24,7 @@ module dual_stack (
 
   stack #(
     .ADDR(0),
-    .WORDS(24)
+    .WORDS(16)
   ) stack0 (
     .clk(clk),
     .rst_n(rst_n),

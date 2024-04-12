@@ -7,7 +7,7 @@ from cocotb.triggers import ClockCycles
 
 import random
 
-S0_SIZE = 24
+S0_SIZE = 16
 S1_SIZE = 24
 
 @cocotb.test()
