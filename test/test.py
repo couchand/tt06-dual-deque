@@ -79,6 +79,15 @@ async def test_stacks(dut):
   # Now stack 0 full
   assert dut.uio_out.value & 0xF0 == 0x60
 
+  # Try replacement
+  dut.ui_in.value = 0x81
+  dut.uio_in.value = 6
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0x81
+  assert dut.uio_out.value & 0xF0 == 0x60
+
   ## Stack 1
   dut.ui_in.value = 0x42
   dut.uio_in.value = 3
@@ -108,6 +117,15 @@ async def test_stacks(dut):
   assert dut.uo_out.value == 0x9F
 
   # Now stack 1 full, too
+  assert dut.uio_out.value & 0xF0 == 0xA0
+
+  # Try replacement
+  dut.ui_in.value = 0x81
+  dut.uio_in.value = 7
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 1
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0x81
   assert dut.uio_out.value & 0xF0 == 0xA0
 
   # Pop

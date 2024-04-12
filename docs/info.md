@@ -19,6 +19,12 @@ To pop (if `empty` is low):
 - Select which stack to pop with `stack_select`
 - Bring `pop` high for one cycle
 
+To replace the top of the stack (if `empty` is low):
+
+- Select which stack with `stack_select`
+- Put the new data byte on `data_in`
+- Bring both `push` and `pop` high for one cycle
+
 To read the top of stack:
 
 - Select which stack to read with `stack_select`

@@ -41,7 +41,9 @@ module stack #(
       end
     end else if (stack_select == ADDR) begin
       ss <= 1;
-      if (push & ~full) begin
+      if (push & pop & ~empty) begin
+        STACK[addr_rd] <= data_in;
+      end else if (push & ~full) begin
         STACK[addr_wr] <= data_in;
         addr_wr <= addr_wr + 1;
         empty <= 0;
