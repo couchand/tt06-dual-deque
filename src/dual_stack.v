@@ -39,7 +39,7 @@ module dual_stack (
 
   stack #(
     .ADDR(1),
-    .WORDS(24)
+    .WORDS(20)
   ) stack1 (
     .clk(clk),
     .rst_n(rst_n),
