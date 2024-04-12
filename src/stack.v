@@ -27,7 +27,7 @@ module stack #(
 
   wire [addr_bits-1:0] addr_rd = addr_wr - 1;
 
-  assign full = addr_wr == 0 & ~empty;
+  assign full = addr_rd == WORDS - 1 & ~empty;
   assign data_out = empty | stack_select != ADDR ? 0 : STACK[addr_rd];
 
   always @(posedge clk) begin
