@@ -24,15 +24,13 @@ module stack #(
 
   reg [addr_bits-1:0] addr_wr;
   reg [7:0] STACK[WORDS - 1:0];
-  reg ss;
 
   wire [addr_bits-1:0] addr_rd = addr_wr - 1;
 
   assign full = addr_rd == WORDS - 1 & ~empty;
-  assign data_out = empty | ss != ADDR ? 0 : STACK[addr_rd];
+  assign data_out = empty | stack_select != ADDR ? 0 : STACK[addr_rd];
 
   always @(posedge clk) begin
-    ss <= stack_select;
     if (!rst_n) begin
       empty <= 1;
       addr_wr <= 0;
