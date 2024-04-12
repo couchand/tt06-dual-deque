@@ -7,6 +7,9 @@ from cocotb.triggers import ClockCycles
 
 import random
 
+S0_SIZE = 16
+S1_SIZE = 16
+
 @cocotb.test()
 async def test_stacks(dut):
   dut._log.info("Start")
@@ -57,7 +60,7 @@ async def test_stacks(dut):
   # Only stack 1 empty now
   assert dut.uio_out.value & 0xF0 == 0x40
 
-  for i in range(1, 15):
+  for i in range(1, S0_SIZE - 1):
     dut.ui_in.value = i
     dut.uio_in.value = 2
     await ClockCycles(dut.clk, 1)
@@ -88,7 +91,7 @@ async def test_stacks(dut):
   # Stack 1 no longer empty
   assert dut.uio_out.value & 0xF0 == 0x20
 
-  for i in range(1, 15):
+  for i in range(1, S1_SIZE - 1):
     dut.ui_in.value = i
     dut.uio_in.value = 3
     await ClockCycles(dut.clk, 1)
@@ -112,23 +115,16 @@ async def test_stacks(dut):
 
   dut.uio_in.value = 4
   await ClockCycles(dut.clk, 1)
-  dut.uio_in.value = 5
-  await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 0
   await ClockCycles(dut.clk, 1)
 
-  assert dut.uio_out.value & 0xF0 == 0x00
+  assert dut.uio_out.value & 0xF0 == 0x80
 
-  for i in range(14, 0, -1):
+  for i in range(S0_SIZE - 2, 0, -1):
     dut.uio_in.value = 4
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == i
-    assert dut.uio_out.value & 0xF0 == 0x00
-
-    dut.uio_in.value = 5
-    await ClockCycles(dut.clk, 1)
-    assert dut.uo_out.value == i
-    assert dut.uio_out.value & 0xF0 == 0x00
+    assert dut.uio_out.value & 0xF0 == 0x80
 
     dut.uio_in.value = 0
     await ClockCycles(dut.clk, 1)
@@ -136,12 +132,35 @@ async def test_stacks(dut):
   dut.uio_in.value = 0
   await ClockCycles(dut.clk, 1)
   assert dut.uo_out.value == 0x42
+
+  dut.uio_in.value = 4
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+
+  # Now Stack 0 empty, Stack 1 Full
+  assert dut.uio_out.value & 0xF0 == 0x90
+
+  dut.uio_in.value = 5
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+
+  assert dut.uio_out.value & 0xF0 == 0x10
+
+  for i in range(S1_SIZE - 2, 0, -1):
+    dut.uio_in.value = 5
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value == i
+    assert dut.uio_out.value & 0xF0 == 0x10
+
+    dut.uio_in.value = 0
+    await ClockCycles(dut.clk, 1)
+
   dut.uio_in.value = 1
   await ClockCycles(dut.clk, 1)
   assert dut.uo_out.value == 0x42
 
-  dut.uio_in.value = 4
-  await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 5
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 0
@@ -177,7 +196,7 @@ async def test_fuzz(dut):
   for step in range(0, 4096):
     if len(s0) == 0:
       assert dut.uio_out.value & 0x30 == 0x10
-    elif len(s0) == 16:
+    elif len(s0) == S0_SIZE:
       assert dut.uio_out.value & 0x30 == 0x20
     else:
       assert dut.uio_out.value & 0x30 == 0x00
@@ -190,7 +209,7 @@ async def test_fuzz(dut):
 
     if len(s1) == 0:
       assert dut.uio_out.value & 0xC0 == 0x40
-    elif len(s1) == 16:
+    elif len(s1) == S1_SIZE:
       assert dut.uio_out.value & 0xC0 == 0x80
     else:
       assert dut.uio_out.value & 0xC0 == 0x00
@@ -214,7 +233,7 @@ async def test_fuzz(dut):
     if choice == 'push0':
       nextval = random.randrange(0, 256)
 
-      if len(s0) < 16:
+      if len(s0) < S0_SIZE:
         s0.append(nextval)
 
       dut.ui_in.value = nextval
@@ -226,7 +245,7 @@ async def test_fuzz(dut):
     elif choice == 'push1':
       nextval = random.randrange(0, 256)
 
-      if len(s1) < 16:
+      if len(s1) < S1_SIZE:
         s1.append(nextval)
 
       dut.ui_in.value = nextval
