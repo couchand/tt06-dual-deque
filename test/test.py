@@ -259,6 +259,9 @@ async def test_fuzz(dut):
   for step in range(0, 4096):
     await ClockCycles(dut.clk, 1)
 
+    #dut._log.info(f's0 {s0}')
+    #dut._log.info(f's1 {s1}')
+
     if len(s0) == 0:
       assert dut.uio_out.value & 0x30 == 0x10
     elif len(s0) == S0_SIZE:
@@ -295,13 +298,17 @@ async def test_fuzz(dut):
       'popb0',
       'popf1',
       'popb1',
+      'replacef0',
+      'replaceb0',
+      'replacef1',
+      'replaceb1',
       'toggle',
     ]
     choice = random.choice(options)
+    nextval = random.randrange(0, 256)
+    #dut._log.info(f'{choice} {nextval}')
 
     if choice == 'pushf0':
-      nextval = random.randrange(0, 256)
-
       if len(s0) < S0_SIZE:
         s0.append(nextval)
 
@@ -312,8 +319,6 @@ async def test_fuzz(dut):
       await ClockCycles(dut.clk, 1)
 
     if choice == 'pushb0':
-      nextval = random.randrange(0, 256)
-
       if len(s0) < S0_SIZE:
         s0.insert(0, nextval)
 
@@ -324,8 +329,6 @@ async def test_fuzz(dut):
       await ClockCycles(dut.clk, 1)
 
     elif choice == 'pushf1':
-      nextval = random.randrange(0, 256)
-
       if len(s1) < S1_SIZE:
         s1.append(nextval)
 
@@ -336,8 +339,6 @@ async def test_fuzz(dut):
       await ClockCycles(dut.clk, 1)
 
     elif choice == 'pushb1':
-      nextval = random.randrange(0, 256)
-
       if len(s1) < S1_SIZE:
         s1.insert(0, nextval)
 
@@ -385,6 +386,50 @@ async def test_fuzz(dut):
 
     elif choice == 'toggle':
       ss = 1 - ss
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    if choice == 'replacef0':
+      if len(s0) > 0:
+        s0.pop()
+        s0.append(nextval)
+
+      dut.ui_in.value = nextval
+      dut.uio_in.value = 12
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    if choice == 'replaceb0':
+      if len(s0) > 0:
+        del s0[0]
+        s0.insert(0, nextval)
+
+      dut.ui_in.value = nextval
+      dut.uio_in.value = 14
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'replacef1':
+      if len(s1) > 0:
+        s1.pop()
+        s1.append(nextval)
+
+      dut.ui_in.value = nextval
+      dut.uio_in.value = 13
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'replaceb1':
+      if len(s1) > 0:
+        del s1[0]
+        s1.insert(0, nextval)
+
+      dut.ui_in.value = nextval
+      dut.uio_in.value = 15
+      await ClockCycles(dut.clk, 1)
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)
 

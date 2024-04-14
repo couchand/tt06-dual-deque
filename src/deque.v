@@ -48,31 +48,37 @@ module deque #(
     end else if (deque_select == ADDR) begin
       ds <= 1;
       es <= end_select;
-      if (push & pop & ~empty) begin
-        if (end_select) begin
-          DEQUE[back_rd] <= data_in;
-        end else begin
-           DEQUE[front_rd] <= data_in;
-        end
-      end else if (push & ~full) begin
-        empty <= 0;
-        if (end_select) begin
-          DEQUE[back_wr] <= data_in;
-          back_wr <= back_wr == 0 ? WORDS - 1 : back_wr - 1;
-        end else begin
-          DEQUE[front_wr] <= data_in;
-          front_wr <= front_wr == WORDS - 1 ? 0 : front_wr + 1;
-        end
-      end else if (pop & ~empty) begin
-        if (end_select) begin
-          back_wr <= back_rd;
-          if (back_rd == front_rd) begin
-            empty <= 1;
+      if (push & pop) begin
+        if (~empty) begin
+          if (end_select) begin
+            DEQUE[back_rd] <= data_in;
+          end else begin
+             DEQUE[front_rd] <= data_in;
           end
-        end else begin
-          front_wr <= front_rd;
-          if (front_rd == back_rd) begin
-            empty <= 1;
+        end
+      end else if (push) begin
+        if (~full) begin
+          empty <= 0;
+          if (end_select) begin
+            DEQUE[back_wr] <= data_in;
+            back_wr <= back_wr == 0 ? WORDS - 1 : back_wr - 1;
+          end else begin
+            DEQUE[front_wr] <= data_in;
+            front_wr <= front_wr == WORDS - 1 ? 0 : front_wr + 1;
+          end
+        end
+      end else if (pop) begin
+        if (~empty) begin
+          if (end_select) begin
+            back_wr <= back_rd;
+            if (back_rd == front_rd) begin
+              empty <= 1;
+            end
+          end else begin
+            front_wr <= front_rd;
+            if (front_rd == back_rd) begin
+              empty <= 1;
+            end
           end
         end
       end
