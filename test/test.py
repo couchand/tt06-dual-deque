@@ -8,7 +8,7 @@ from cocotb.triggers import ClockCycles
 import random
 
 S0_SIZE = 16
-S1_SIZE = 15
+S1_SIZE = 12
 
 @cocotb.test()
 async def test_queues(dut):

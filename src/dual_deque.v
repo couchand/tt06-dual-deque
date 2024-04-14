@@ -41,7 +41,7 @@ module dual_deque (
 
   deque #(
     .ADDR(1),
-    .WORDS(15)
+    .WORDS(12)
   ) deque1 (
     .clk(clk),
     .rst_n(rst_n),
