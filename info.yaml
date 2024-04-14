@@ -1,9 +1,9 @@
 # Tiny Tapeout project information
 project:
-  title:        "Dual Stack"      # Project title
+  title:        "Dual Deque"      # Project title
   author:       "Andrew Dona-Couch"      # Your name
   discord:      "couchand_75981"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "Dual byte stacks"      # One line description of what your project does
+  description:  "Dual byte-width double-ended queues"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
 
@@ -11,13 +11,13 @@ project:
   tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_couchand_dual_stack"
+  top_module:  "tt_um_couchand_dual_deque"
 
   # List your project's source files here. Source files must be in ./src and you must list each source file separately, one per line:
   source_files:
     - "project.v"
-    - "dual_stack.v"
-    - "stack.v"
+    - "dual_deque.v"
+    - "deque.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
@@ -42,14 +42,14 @@ pinout:
   uo[7]: "Data Out 7"
 
   # Bidirectional pins
-  uio[0]: "Stack Select"
-  uio[1]: "Push"
-  uio[2]: "Pop"
-  uio[3]: ""
-  uio[4]: "Stack 0 Empty"
-  uio[5]: "Stack 0 Full"
-  uio[6]: "Stack 1 Empty"
-  uio[7]: "Stack 1 Full"
+  uio[0]: "Deque Select"
+  uio[1]: "End Select"
+  uio[2]: "Push"
+  uio[3]: "Pop"
+  uio[4]: "Deque 0 Empty"
+  uio[5]: "Deque 0 Full"
+  uio[6]: "Deque 1 Empty"
+  uio[7]: "Deque 1 Full"
 
 # Do not change!
 yaml_version: 6
