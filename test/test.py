@@ -50,7 +50,7 @@ async def test_stacks(dut):
 
   ## Stack 0
   dut.ui_in.value = 0x42
-  dut.uio_in.value = 2
+  dut.uio_in.value = 4
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 0
   await ClockCycles(dut.clk, 1)
@@ -62,7 +62,7 @@ async def test_stacks(dut):
 
   for i in range(1, S0_SIZE - 1):
     dut.ui_in.value = i
-    dut.uio_in.value = 2
+    dut.uio_in.value = 4
     await ClockCycles(dut.clk, 1)
     dut.uio_in.value = 0
     await ClockCycles(dut.clk, 1)
@@ -70,7 +70,7 @@ async def test_stacks(dut):
     assert dut.uio_out.value & 0xF0 == 0x40
 
   dut.ui_in.value = 0x9F
-  dut.uio_in.value = 2
+  dut.uio_in.value = 4
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 0
   await ClockCycles(dut.clk, 1)
@@ -81,7 +81,7 @@ async def test_stacks(dut):
 
   # Try replacement
   dut.ui_in.value = 0x81
-  dut.uio_in.value = 6
+  dut.uio_in.value = 12
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 0
   await ClockCycles(dut.clk, 1)
@@ -90,7 +90,7 @@ async def test_stacks(dut):
 
   ## Stack 1
   dut.ui_in.value = 0x42
-  dut.uio_in.value = 3
+  dut.uio_in.value = 5
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 1
   await ClockCycles(dut.clk, 1)
@@ -102,7 +102,7 @@ async def test_stacks(dut):
 
   for i in range(1, S1_SIZE - 1):
     dut.ui_in.value = i
-    dut.uio_in.value = 3
+    dut.uio_in.value = 5
     await ClockCycles(dut.clk, 1)
     dut.uio_in.value = 1
     await ClockCycles(dut.clk, 1)
@@ -110,7 +110,7 @@ async def test_stacks(dut):
     assert dut.uio_out.value & 0xF0 == 0x20
 
   dut.ui_in.value = 0x9F
-  dut.uio_in.value = 3
+  dut.uio_in.value = 5
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 1
   await ClockCycles(dut.clk, 1)
@@ -121,7 +121,7 @@ async def test_stacks(dut):
 
   # Try replacement
   dut.ui_in.value = 0x81
-  dut.uio_in.value = 7
+  dut.uio_in.value = 13
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 1
   await ClockCycles(dut.clk, 1)
@@ -131,7 +131,7 @@ async def test_stacks(dut):
   # Pop
   dut._log.info("Pop")
 
-  dut.uio_in.value = 4
+  dut.uio_in.value = 8
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 0
   await ClockCycles(dut.clk, 1)
@@ -139,7 +139,7 @@ async def test_stacks(dut):
   assert dut.uio_out.value & 0xF0 == 0x80
 
   for i in range(S0_SIZE - 2, 0, -1):
-    dut.uio_in.value = 4
+    dut.uio_in.value = 8
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == i
     assert dut.uio_out.value & 0xF0 == 0x80
@@ -151,7 +151,7 @@ async def test_stacks(dut):
   await ClockCycles(dut.clk, 1)
   assert dut.uo_out.value == 0x42
 
-  dut.uio_in.value = 4
+  dut.uio_in.value = 8
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 0
   await ClockCycles(dut.clk, 1)
@@ -159,7 +159,7 @@ async def test_stacks(dut):
   # Now Stack 0 empty, Stack 1 Full
   assert dut.uio_out.value & 0xF0 == 0x90
 
-  dut.uio_in.value = 5
+  dut.uio_in.value = 9
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 1
   await ClockCycles(dut.clk, 1)
@@ -167,7 +167,7 @@ async def test_stacks(dut):
   assert dut.uio_out.value & 0xF0 == 0x10
 
   for i in range(S1_SIZE - 2, 0, -1):
-    dut.uio_in.value = 5
+    dut.uio_in.value = 9
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == i
     assert dut.uio_out.value & 0xF0 == 0x10
@@ -179,7 +179,7 @@ async def test_stacks(dut):
   await ClockCycles(dut.clk, 1)
   assert dut.uo_out.value == 0x42
 
-  dut.uio_in.value = 5
+  dut.uio_in.value = 9
   await ClockCycles(dut.clk, 1)
   dut.uio_in.value = 1
   await ClockCycles(dut.clk, 1)
@@ -257,7 +257,7 @@ async def test_fuzz(dut):
         s0.append(nextval)
 
       dut.ui_in.value = nextval
-      dut.uio_in.value = 2
+      dut.uio_in.value = 4
       await ClockCycles(dut.clk, 1)
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)
@@ -269,7 +269,7 @@ async def test_fuzz(dut):
         s1.append(nextval)
 
       dut.ui_in.value = nextval
-      dut.uio_in.value = 3
+      dut.uio_in.value = 5
       await ClockCycles(dut.clk, 1)
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)
@@ -278,7 +278,7 @@ async def test_fuzz(dut):
       if len(s0) > 0:
         s0.pop()
 
-      dut.uio_in.value = 4
+      dut.uio_in.value = 8
       await ClockCycles(dut.clk, 1)
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)
@@ -287,7 +287,7 @@ async def test_fuzz(dut):
       if len(s1) > 0:
         s1.pop()
 
-      dut.uio_in.value = 5
+      dut.uio_in.value = 9
       await ClockCycles(dut.clk, 1)
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)

@@ -22,13 +22,14 @@ module tt_um_couchand_dual_deque (
   dual_deque dual_deque_instance (
     .clk(clk),
     .rst_n(rst_n),
-    .s0_empty(uio_out[4]),
-    .s0_full(uio_out[5]),
-    .s1_empty(uio_out[6]),
-    .s1_full(uio_out[7]),
+    .d0_empty(uio_out[4]),
+    .d0_full(uio_out[5]),
+    .d1_empty(uio_out[6]),
+    .d1_full(uio_out[7]),
     .deque_select(uio_in[0]),
-    .push(uio_in[1]),
-    .pop(uio_in[2]),
+    .end_select(uio_in[1]),
+    .push(uio_in[2]),
+    .pop(uio_in[3]),
     .data_in(ui_in),
     .data_out(uo_out)
   );

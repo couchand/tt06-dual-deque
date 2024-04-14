@@ -8,19 +8,20 @@
 module dual_deque (
     input  wire       clk,
     input  wire       rst_n,
-    output wire       s0_empty,
-    output wire       s0_full,
-    output wire       s1_empty,
-    output wire       s1_full,
+    output wire       d0_empty,
+    output wire       d0_full,
+    output wire       d1_empty,
+    output wire       d1_full,
     input  wire       deque_select,
+    input  wire       end_select,
     input  wire       push,
     input  wire       pop,
     input  wire [7:0] data_in,
     output wire [7:0] data_out
 );
 
-  wire [7:0] s0_out, s1_out;
-  assign data_out = s0_out | s1_out;
+  wire [7:0] d0_out, d1_out;
+  assign data_out = d0_out | d1_out;
 
   deque #(
     .ADDR(0),
@@ -28,13 +29,14 @@ module dual_deque (
   ) deque0 (
     .clk(clk),
     .rst_n(rst_n),
-    .empty(s0_empty),
-    .full(s0_full),
+    .empty(d0_empty),
+    .full(d0_full),
     .deque_select(deque_select),
+    .end_select(end_select),
     .push(push),
     .pop(pop),
     .data_in(data_in),
-    .data_out(s0_out)
+    .data_out(d0_out)
   );
 
   deque #(
@@ -43,13 +45,14 @@ module dual_deque (
   ) deque1 (
     .clk(clk),
     .rst_n(rst_n),
-    .empty(s1_empty),
-    .full(s1_full),
+    .empty(d1_empty),
+    .full(d1_full),
     .deque_select(deque_select),
+    .end_select(end_select),
     .push(push),
     .pop(pop),
     .data_in(data_in),
-    .data_out(s1_out)
+    .data_out(d1_out)
   );
 
 endmodule
