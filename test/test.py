@@ -11,6 +11,51 @@ S0_SIZE = 16
 S1_SIZE = 16
 
 @cocotb.test()
+async def test_queues(dut):
+  dut._log.info("Start")
+
+  clock = Clock(dut.clk, 10, units="us")
+  cocotb.start_soon(clock.start())
+
+  # Reset
+  dut._log.info("Reset")
+  dut.ena.value = 1
+  dut.ui_in.value = 0
+  dut.uio_in.value = 0
+  dut.rst_n.value = 0
+  await ClockCycles(dut.clk, 10)
+  dut.rst_n.value = 1
+
+  # Queue 0
+  dut._log.info("Push")
+  dut.ui_in.value = 0x42
+  dut.uio_in.value = 4
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0x42
+
+  # Only stack 1 empty now
+  assert dut.uio_out.value & 0xF0 == 0x40
+
+  dut.ui_in.value = 0xAB
+  dut.uio_in.value = 4
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0xAB
+
+  dut.uio_in.value = 2
+  await ClockCycles(dut.clk, 2)
+  assert dut.uo_out.value == 0x42
+
+  dut.uio_in.value = 0xA
+  await ClockCycles(dut.clk, 1)
+  dut.uio_in.value = 0
+  await ClockCycles(dut.clk, 1)
+  assert dut.uo_out.value == 0xAB
+
+@cocotb.test()
 async def test_stacks(dut):
   dut._log.info("Start")
 
@@ -242,15 +287,19 @@ async def test_fuzz(dut):
 
     options = [
       'nop',
-      'push0',
-      'push1',
-      'pop0',
-      'pop1',
+      'pushf0',
+      'pushb0',
+      'pushf1',
+      'pushb1',
+      'popf0',
+      'popb0',
+      'popf1',
+      'popb1',
       'toggle',
     ]
     choice = random.choice(options)
 
-    if choice == 'push0':
+    if choice == 'pushf0':
       nextval = random.randrange(0, 256)
 
       if len(s0) < S0_SIZE:
@@ -262,7 +311,19 @@ async def test_fuzz(dut):
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)
 
-    elif choice == 'push1':
+    if choice == 'pushb0':
+      nextval = random.randrange(0, 256)
+
+      if len(s0) < S0_SIZE:
+        s0.insert(0, nextval)
+
+      dut.ui_in.value = nextval
+      dut.uio_in.value = 6
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'pushf1':
       nextval = random.randrange(0, 256)
 
       if len(s1) < S1_SIZE:
@@ -274,7 +335,19 @@ async def test_fuzz(dut):
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)
 
-    elif choice == 'pop0':
+    elif choice == 'pushb1':
+      nextval = random.randrange(0, 256)
+
+      if len(s1) < S1_SIZE:
+        s1.insert(0, nextval)
+
+      dut.ui_in.value = nextval
+      dut.uio_in.value = 7
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'popf0':
       if len(s0) > 0:
         s0.pop()
 
@@ -283,11 +356,29 @@ async def test_fuzz(dut):
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)
 
-    elif choice == 'pop1':
+    elif choice == 'popb0':
+      if len(s0) > 0:
+        del s0[0]
+
+      dut.uio_in.value = 10
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'popf1':
       if len(s1) > 0:
         s1.pop()
 
       dut.uio_in.value = 9
+      await ClockCycles(dut.clk, 1)
+      dut.uio_in.value = ss
+      await ClockCycles(dut.clk, 1)
+
+    elif choice == 'popb1':
+      if len(s1) > 0:
+        del s1[0]
+
+      dut.uio_in.value = 11
       await ClockCycles(dut.clk, 1)
       dut.uio_in.value = ss
       await ClockCycles(dut.clk, 1)

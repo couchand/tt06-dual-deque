@@ -30,17 +30,16 @@ module deque #(
   wire [addr_bits-1:0] front_rd = front_wr != 0 ? front_wr - 1 : WORDS - 1;
   wire [addr_bits-1:0] back_rd = back_wr != WORDS - 1 ? back_wr + 1 : 0;
 
-  assign full = front_wr == back_wr & ~empty;
+  assign full = (front_wr == ((back_wr + 1) % WORDS)) & ~empty;
 
-  wire [addr_bits-1:0] addr_wr = es ? back_wr : front_wr;
-  wire [addr_bits-1:0] addr_rd = es ? back_rd : front_rd;
-  assign data_out = empty | ~ds ? 0 : DEQUE[addr_rd];
+  assign data_out = empty | ~ds ? 0
+    : es ? DEQUE[back_rd] : DEQUE[front_rd];
 
   always @(posedge clk) begin
     if (!rst_n) begin
       empty <= 1;
       front_wr <= 0;
-      back_wr <= 0;
+      back_wr <= WORDS - 1;
       ds <= 0;
       es <= 0;
       for (int i = 0; i < WORDS; i++) begin
@@ -50,24 +49,29 @@ module deque #(
       ds <= 1;
       es <= end_select;
       if (push & pop & ~empty) begin
-        DEQUE[addr_rd] <= data_in;
-      end else if (push & ~full) begin
-        DEQUE[addr_wr] <= data_in;
-        empty <= 0;
-        if (es) begin
-          back_wr <= back_wr == 0 ? WORDS : back_wr - 1;
+        if (end_select) begin
+          DEQUE[back_rd] <= data_in;
         end else begin
+           DEQUE[front_rd] <= data_in;
+        end
+      end else if (push & ~full) begin
+        empty <= 0;
+        if (end_select) begin
+          DEQUE[back_wr] <= data_in;
+          back_wr <= back_wr == 0 ? WORDS - 1 : back_wr - 1;
+        end else begin
+          DEQUE[front_wr] <= data_in;
           front_wr <= front_wr == WORDS - 1 ? 0 : front_wr + 1;
         end
       end else if (pop & ~empty) begin
-        if (es) begin
+        if (end_select) begin
           back_wr <= back_rd;
-          if (back_rd == front_wr) begin
+          if (back_rd == front_rd) begin
             empty <= 1;
           end
         end else begin
           front_wr <= front_rd;
-          if (front_rd == back_wr) begin
+          if (front_rd == back_rd) begin
             empty <= 1;
           end
         end
