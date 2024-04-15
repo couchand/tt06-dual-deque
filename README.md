@@ -1,8 +1,10 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# Dual Byte-sized Double-ended Queues
 
 - [Read the documentation for project](docs/info.md)
+
+This project is a submission to Tiny Tapeout.
 
 ## What is Tiny Tapeout?
 
